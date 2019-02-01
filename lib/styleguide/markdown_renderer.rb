@@ -7,12 +7,15 @@ module Styleguide
       when "example"
         options, code = parse_options(code)
         example(code, options)
+      when "table"
+        options, code = parse_options(code)
+        table(eval(code), options)
       else
         super
       end
     end
 
-    def example(code, options)
+    def example(code, options = {})
       <<-EXAMPLE
         <div class="example">
           <iframe src="/styleguide/example?example=#{Base64.urlsafe_encode64(code)}"
@@ -23,6 +26,34 @@ module Styleguide
           #{block_code(code.strip, 'erb')}
         </div>
       EXAMPLE
+    end
+
+    def table(data, options = {})
+      attributes_table = <<-ATTRIBUTES
+        <table>
+      ATTRIBUTES
+
+      data.each do |row|
+        attributes_table += <<-ATTRIBUTES
+          <tr>
+        ATTRIBUTES
+
+        row.each do |cell|
+          attributes_table += <<-ATTRIBUTES
+            <td>#{cell}</td>
+          ATTRIBUTES
+        end
+
+        attributes_table += <<-ATTRIBUTES
+          </tr>
+        ATTRIBUTES
+      end
+
+      attributes_table += <<-ATTRIBUTES
+        </table>
+      ATTRIBUTES
+
+      attributes_table
     end
 
     private
